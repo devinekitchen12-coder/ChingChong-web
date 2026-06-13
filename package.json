@@ -1,0 +1,20 @@
+{
+  "name": "ching-kong",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Official website for Ching Kong - Our Wok Talks. Indo-Chinese restaurant in Panchkula.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^5.4.10"
+  }
+}
