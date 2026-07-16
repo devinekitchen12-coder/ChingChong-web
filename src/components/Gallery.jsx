@@ -1,3 +1,11 @@
+import { useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { fadeUp, staggerContainer, viewportSettings } from '../hooks/useScrollReveal.js'
+
+gsap.registerPlugin(ScrollTrigger)
+
 const images = [
   { src: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&q=80', alt: 'Crispy spring rolls', cls: 'tall' },
   { src: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&q=80', alt: 'Honey chilli', cls: '' },
@@ -9,22 +17,61 @@ const images = [
 ]
 
 export default function Gallery() {
+  const gridRef = useRef(null)
+
+  useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (prefersReduced) return
+
+    const items = gsap.utils.toArray('.gallery-item-anim')
+    
+    items.forEach((item, index) => {
+      // Create a slight parallax effect - some items move up slightly faster/slower based on index
+      const speed = index % 2 === 0 ? -15 : -30;
+      
+      gsap.to(item, {
+        y: speed,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: gridRef.current,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      })
+    })
+  }, [])
+
   return (
     <section id="gallery" className="gallery">
       <div className="container">
-        <div className="section-head">
-          <p className="section-eyebrow">Gallery</p>
-          <h2 className="section-title">
+        <motion.div 
+          className="section-head"
+          variants={staggerContainer(0.1, 0)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportSettings}
+        >
+          <motion.p className="section-eyebrow" variants={fadeUp}>Gallery</motion.p>
+          <motion.h2 className="section-title" variants={fadeUp}>
             A FEAST FOR <span className="accent">THE EYES</span>
-          </h2>
-          <p className="section-sub">Snapshots from our wok — flames, sauces and happy plates.</p>
-        </div>
+          </motion.h2>
+          <motion.p className="section-sub" variants={fadeUp}>Snapshots from our wok — flames, sauces and happy plates.</motion.p>
+        </motion.div>
 
-        <div className="gallery-grid">
+        <div className="gallery-grid" ref={gridRef}>
           {images.map((img, i) => (
-            <div key={i} className={`gallery-item ${img.cls}`}>
+            <motion.div 
+              key={i} 
+              className={`gallery-item gallery-item-anim ${img.cls}`}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+              viewport={{ once: true, amount: 0.15 }}
+            >
               <img src={img.src} alt={img.alt} loading="lazy" />
-            </div>
+              <div className="gallery-overlay-text">{img.alt}</div>
+            </motion.div>
           ))}
         </div>
       </div>
